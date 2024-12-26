@@ -1,8 +1,6 @@
 # Docker版Abaqus，兼容各种Linux版本，开箱即用
 
-![logo](./resources/readme/logo.png)
-
----
+<img src="./resources/readme/logo.png" width="200" align="right"/>
 
 本文分享了我制作的Abaqus 2021的Docker镜像，可以在任何装有Docker的Linux系统上运行（包括WSL），无需复杂的安装过程，开箱即用。[下载链接](#镜像下载)和[使用方法](#使用方法)详见后文。
 
@@ -18,7 +16,7 @@ For English readers, I am sorry that there is no English version of this README 
 
 （要查看系统的glibc版本，可以使用命令 `ldd --version`）
 
-Abaqus官方的Linux安装程序会检查系统的发行版信息，限制其只能安装在RHEL系列的系统上，但只要修改安装脚本，就可以绕过这一限制安装在其他发行版上（例如Ubuntu）。**然而，顺利安装并不意味着Abaqus能够成功运行。** 例如，根据(https://github.com/willfurnass/abaqus-2017-centos-7-singularity/issues/5)，在glibc版本>=2.25的系统上，Abaqus 2020的standard求解器无法正常中止。尽管官方后来发布了Abaqus 2020的Hotfix版本修复了这个问题，但由于没有好心人发布该Hotfix版本的破解版，因此对于不花钱的用户来说，这个问题依然无法解决。
+Abaqus官方的Linux安装程序会检查系统的发行版信息，限制其只能安装在RHEL系列的系统上，但只要修改安装脚本，就可以绕过这一限制安装在其他发行版上（例如Ubuntu）。**然而，顺利安装并不意味着Abaqus能够成功运行。** 例如，根据[这个issue](https://github.com/willfurnass/abaqus-2017-centos-7-singularity/issues/5)，在glibc版本>=2.25的系统上，Abaqus 2020的standard求解器无法正常中止。尽管官方后来发布了Abaqus 2020的Hotfix版本修复了这个问题，但由于没有好心人发布该Hotfix版本的破解版，因此对于不花钱的用户来说，这个问题依然无法解决。
 
 要避免glibc的兼容性问题，当然可以使用低版本glibc的系统，比如在CentOS 7这种老系统（glibc版本为2.17）上安装运行古董的Abaqus 6.14就没有问题。但是，一些现代化的软件早就抛弃低版本glibc了，比如VSCode从1.86版本开始要求远程服务器的glibc版本>=2.28。所以，要使用Abaqus就只能放弃新系统的便利性。
 
@@ -40,7 +38,7 @@ Abaqus官方的Linux安装程序会检查系统的发行版信息，限制其只
 
 我制作的镜像包含Standard、Explicit、CAE（可以使用GUI）、ODB API、以及Cosimulation Services，支持User Subroutines。不过，因为关联的是gfortran，不是Intel Fortran，我不保证所有User Subroutines都能正常工作。这个Abaqus镜像的详细制作过程详见后文：[镜像制作过程](#镜像制作过程)。
 
-我应该不是国内第一个做Abaqus Docker镜像的人，Dockerhub上早就有了其他人做的(https://hub.docker.com/search?q=abaqus)，但我这个应该是功能最全的，而且这份README也是目前最详细的。
+我应该不是国内第一个做Abaqus Docker镜像的人，Dockerhub上早就有了[其他人做的](https://hub.docker.com/search?q=abaqus)，但我这个应该是功能最全的，而且这份README也是目前最详细的。
 
 | 镜像内容 | 文件名 | 大小 | 链接 | MD5 |
 | --- | --- | --- | --- | --- |
@@ -68,7 +66,7 @@ docker load -i abq2021.tar
 
 导入镜像要几分钟。导入完成后，可以使用 `docker images` 命令查看镜像，或者使用VSCode的Docker插件查看镜像。
 
-![docker_load_image](./resources/readme/docker_load_image.gif)
+<img width="800" src="./resources/readme/docker_load_image.gif">
 
 ### 创建容器应用
 
@@ -86,7 +84,7 @@ docker run -d --mount type=bind,source=/home,target=/home --name abq2021app abq2
 
 创建这个容器一般只需几秒钟（不过我也曾遇到用时几分钟的情况，原因我也不清楚）。创建好容器后，就可以在容器中使用Abaqus了。
 
-![docker_run_container_exec](./resources/readme/docker_run_container_exec.gif)
+<img width="800" src="./resources/readme/docker_run_container_exec.gif">
 
 #### 需要使用CAE图形界面
 
@@ -106,7 +104,7 @@ docker run -d --mount type=bind,source=/home,target=/home --volume=/tmp/.X11-uni
 docker exec -it abq2021app abaqus cae -mesa
 ```
 
-![docker_exec_gui](./resources/readme/docker_exec_gui.gif)
+<img width="800" src="./resources/readme/docker_exec_gui.gif">
 
 关于远程连接Linux图形界面的相关内容，例如设置X11转发等，因为跟本文主题无关，这里就不介绍了。
 
@@ -160,7 +158,7 @@ docker exec --workdir $(pwd) --user $(id -u):$(id -g) abq2021app abaqus job=Job-
 
 每次运行Abaqus都要输入这么长的命令很麻烦，用非root账户运行还要在容器中创建用户，就更麻烦了。为此，可以通过以下方法建立快捷方式，之后只需输入 `abq2021` 命令即可运行Abaqus。
 
-![docker_shortcut](./resources/readme/docker_shortcut.gif)
+<img width="800" src="./resources/readme/docker_shortcut.gif">
 
 在 `/usr/local/bin` 目录下创建一个脚本文件 `abq2021` ，内容如下：
 
@@ -222,7 +220,7 @@ docker pull centos:7
 
 安装Abaqus前，需要先在CentOS 7镜像中开启systemd服务，并安装Abaqus安装所需的依赖库。
 
-CentOS镜像中的systemd服务默认是关闭的，而安装许可证服务需要systemd服务，所以需要开启systemd服务。官方给出了开启的办法，但有点麻烦，有个更简单的办法，参考(https://github.com/gdraheim/docker-systemctl-replacement/tree/master)。
+CentOS镜像中的systemd服务默认是关闭的，而安装许可证服务需要systemd服务，所以需要开启systemd服务。官方给出了开启的办法，但有点麻烦，有个更简单的办法，参考[这个项目](https://github.com/gdraheim/docker-systemctl-replacement/tree/master)。
 
 官方的CentOS 7镜像非常精简，缺少许多命令和库文件。根据我的安装经历，Abaqus依赖以下库文件：
 
@@ -238,7 +236,7 @@ yum install sudo dos2unix perl libX11 libjpeg libXext
 yum install gcc-gfortran
 ```
 
-如果不怕折腾，也可以挑战一下Intel Fortran。这部分后文有更详细的[说明](#关联Fortran编译器)。
+如果不怕折腾，也可以挑战一下Intel Fortran。这部分后文有更详细的[说明](#关联fortran编译器)。
 
 如果要用C++编写User Subroutine，还需要安装g++。不过估计没人用C++写子程序，所以这里我没有装。
 
@@ -507,11 +505,11 @@ docker build -t abq2021-tmp3 .
 Unexpected end of /proc/mounts line `overlay / overlay rw,relatime,lowerdir=/var/lib/docker/overlay2/l/...
 ```
 
-这似乎是由MPI的bug引起的，详见(https://stackoverflow.com/questions/46138549/docker-openmpi-and-unexpected-end-of-proc-mounts-line)。由于Docker是分层存储的，经过前三步制作的镜像中包含了许多层，导致 `/proc/mount` 文件中一行超过512个字符，MPI无法正确解析。
+这似乎是由MPI的bug引起的，详见[这个问题](https://stackoverflow.com/questions/46138549/docker-openmpi-and-unexpected-end-of-proc-mounts-line)。由于Docker是分层存储的，经过前三步制作的镜像中包含了许多层，导致 `/proc/mount` 文件中一行超过512个字符，MPI无法正确解析。
 
 解决方法是使用将镜像squash成一个层，这样就没问题了。
 
-我使用了docker-squash工具(https://github.com/goldmann/docker-squash)。pip安装完docker-squash后，使用以下命令将镜像squash成一个层：
+我使用了[docker-squash工具](https://github.com/goldmann/docker-squash)。pip安装完docker-squash后，使用以下命令将镜像squash成一个层：
 
 ```bash
 docker-squash -f $(($(docker history abq2021-tmp3 | wc -l | xargs)-1)) -t abq2021:latest abq2021-tmp3
