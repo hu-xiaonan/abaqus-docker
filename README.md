@@ -1,6 +1,8 @@
 # Docker版Abaqus，兼容各种Linux版本，开箱即用
 
-<img src="./resources/readme/logo.png" width="200" align="right"/>
+<p align="center">
+  <img width="300" src="./resources/readme/logo.png">
+</p>
 
 本文分享了我制作的Abaqus 2021的Docker镜像，可以在任何装有Docker的Linux系统上运行（包括WSL），无需复杂的安装过程，开箱即用。[下载链接](#镜像下载)和[使用方法](#使用方法)详见后文。
 
