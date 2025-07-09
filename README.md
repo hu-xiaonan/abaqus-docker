@@ -36,7 +36,7 @@ Abaqus官方的Linux安装程序会检查系统的发行版信息，限制其只
 
 ## 镜像下载
 
-我制作了Abaqus 2021的Docker镜像，可以在任何装有Docker的系统中运行。我已测试过的系统包括CentOS 7、Ubuntu 20.04、运行在WSL里的Ubuntu 24.04。
+我制作了Abaqus 2021和Abaqus 2024的Docker镜像，可以在任何装有Docker的系统中运行。
 
 我制作的镜像包含Standard、Explicit、CAE（可以使用GUI）、ODB API、以及Cosimulation Services，支持User Subroutines。不过，因为关联的是gfortran，不是Intel Fortran，我不保证所有User Subroutines都能正常工作。这个Abaqus镜像的详细制作过程详见后文：[镜像制作过程](#镜像制作过程)。
 
@@ -45,12 +45,20 @@ Abaqus官方的Linux安装程序会检查系统的发行版信息，限制其只
 | 镜像内容 | 文件名 | 大小 | 链接 | MD5 |
 | --- | --- | --- | --- | --- |
 | Abaqus 2021 | abq2021.tar.xz | 1.77 GiB | [清华大学云盘](https://cloud.tsinghua.edu.cn/f/64d14b75ef5246238f6e/?dl=1) | 4c599c6e16ba46c81a915d598349582c |
+| Abaqus 2024 | abq2024.tar.xz | 3.38 GiB | [清华大学云盘](https://cloud.tsinghua.edu.cn/f/4088d4747d714f768803/?dl=1) | 8586471644d26d5a5aa2ff3a1ae3c5f4 |
 
 （如果有需要，可以联系我制作其他版本的Abaqus的Docker镜像）
+
+以上镜像已在以下Linux发行版上测试过：
+
+- Abaqus 2021：CentOS 7、Ubuntu 20.04、WSL中的Ubuntu 24.04
+- Abaqus 2024：Ubuntu 20.04
 
 我没有把镜像上传到Dockerhub或Github Container Registry，主要有两点原因。一是国内访问这些网站受到限制，可能不方便拉取这么大的镜像。二是因为版权问题，毕竟是破解版软件，在国内传播就好，就不往外网传了。
 
 ## 使用方法
+
+下文以Abaqus 2021镜像为例介绍使用方法。Abaqus 2024的使用方法类似，只需将镜像名和容器名分别改为abq2024和abq2024app即可。
 
 ### 导入镜像
 
@@ -203,6 +211,8 @@ abq2021 cae -mesa
 ## 镜像制作过程
 
 这部分是我制作Abaqus 2021的Docker镜像的过程，仅供参考。
+
+Abaqus 2024镜像的制作过程详见[abq2024目录](./abq2024/README.md)。
 
 ### 前置工作
 
