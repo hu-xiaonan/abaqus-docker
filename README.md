@@ -36,7 +36,7 @@ Abaqus官方的Linux安装程序会检查系统的发行版信息，限制其只
 
 ## 镜像下载
 
-我制作了Abaqus 2021的Docker镜像，可以在任何装有Docker的系统中运行。我已测试过的系统包括CentOS 7、Ubuntu 20.04、运行在WSL里的Ubuntu 24.04。
+我制作了Abaqus 2021和Abaqus 2024的Docker镜像，可以在任何装有Docker的系统中运行。
 
 我制作的镜像包含Standard、Explicit、CAE（可以使用GUI）、ODB API、以及Cosimulation Services，支持User Subroutines。不过，因为关联的是gfortran，不是Intel Fortran，我不保证所有User Subroutines都能正常工作。这个Abaqus镜像的详细制作过程详见后文：[镜像制作过程](#镜像制作过程)。
 
@@ -45,12 +45,20 @@ Abaqus官方的Linux安装程序会检查系统的发行版信息，限制其只
 | 镜像内容 | 文件名 | 大小 | 链接 | MD5 |
 | --- | --- | --- | --- | --- |
 | Abaqus 2021 | abq2021.tar.xz | 1.77 GiB | [清华大学云盘](https://cloud.tsinghua.edu.cn/f/64d14b75ef5246238f6e/?dl=1) | 4c599c6e16ba46c81a915d598349582c |
+| Abaqus 2024 | abq2024.tar.xz | 3.38 GiB | [清华大学云盘](https://cloud.tsinghua.edu.cn/f/4088d4747d714f768803/?dl=1) | 8586471644d26d5a5aa2ff3a1ae3c5f4 |
 
 （如果有需要，可以联系我制作其他版本的Abaqus的Docker镜像）
+
+以上镜像已在以下Linux发行版上测试过：
+
+- Abaqus 2021：CentOS 7、Ubuntu 20.04、WSL中的Ubuntu 24.04
+- Abaqus 2024：Ubuntu 20.04
 
 我没有把镜像上传到Dockerhub或Github Container Registry，主要有两点原因。一是国内访问这些网站受到限制，可能不方便拉取这么大的镜像。二是因为版权问题，毕竟是破解版软件，在国内传播就好，就不往外网传了。
 
 ## 使用方法
+
+下文以Abaqus 2021镜像为例介绍使用方法。Abaqus 2024的使用方法类似，只需将镜像名和容器名分别改为abq2024和abq2024app即可。
 
 ### 导入镜像
 
@@ -204,6 +212,8 @@ abq2021 cae -mesa
 
 这部分是我制作Abaqus 2021的Docker镜像的过程，仅供参考。
 
+Abaqus 2024镜像的制作过程详见[abq2024目录](./abq2024/README.md)。
+
 ### 前置工作
 
 准备好Abaqus 2021的Linux安装包，这个安装包是有破解的，我就不提供了。安装包里应该包含：
@@ -219,6 +229,17 @@ docker pull centos:7
 国内访问Dockerhub受到限制，可以使用国内的镜像加速服务，具体方法此处不介绍了。
 
 ### 1. 搭建Abaqus安装环境
+
+这一步可以通过编写Dockerfile来自动化，我已经编写好了，详见 `abq2021/step-1-preliminary` 目录。使用以下命令就可以创建一个名为abq2021-tmp1的临时镜像，该临时镜像是后续安装Abaqus的基础。
+
+```bash
+cd /path/to/abq2021/step-1-preliminary
+docker build -t abq2021-tmp1 .
+```
+
+**注意**：因为涉及到yum install，所以需要网络畅通。过程中出现红字不用怕，只要不是错误就行。
+
+**以下是对Dockerfile中操作的详细解释：**
 
 安装Abaqus前，需要先在CentOS 7镜像中开启systemd服务，并安装Abaqus安装所需的依赖库。
 
@@ -240,20 +261,12 @@ yum install gcc-gfortran
 
 如果不怕折腾，也可以挑战一下Intel Fortran。这部分后文有更详细的[说明](#关联fortran编译器)。
 
-如果要用C++编写User Subroutine，还需要安装g++。不过估计没人用C++写子程序，所以这里我没有装。
+如果要用C++编写User Subroutine，还需要安装g++。不过估计没人用C++写子程序，这里我就没装。
 
-上述搭建Abaqus安装环境的过程可以通过编写Dockerfile来自动化，我已经编写好了，详见 `abq2021/step-1-preliminary` 目录。使用以下命令就可以创建一个名为abq2021-tmp1的临时镜像，该临时镜像是后续安装Abaqus的基础。
-
-```bash
-cd /path/to/abq2021/step-1-preliminary
-docker build -t abq2021-tmp1 .
-```
-
-**注意**：因为涉及到yum install，所以需要网络畅通。过程中出现红字不用怕，只要不是错误就行。
 
 ### 2. 手动安装Abaqus
 
-直接执行Abaqus安装脚本会报错，需要稍微修改安装脚本。
+这一步需要手动操作。首先需要**修改Abaqus安装脚本**，以便能够在容器中的CentOS 7上顺利安装，否则直接运行安装脚本会报错。
 
 - 修改安装包中所有的 `*.sh` 脚本的第一行的shebang，把 `#!/bin/sh` 改成 `#!/bin/bash` 。
 
@@ -263,7 +276,7 @@ docker build -t abq2021-tmp1 .
         DSY_OS_Release=`lsb_release --short --id |sed \'s/ //g\'`
         echo "DSY_OS_Release=\""${DSY_OS_Release}"\""
 
-    同时将 `export DSY_OS_Release=${DSY_OS_Release}` 改为 `export DSY_OS_Release=CentOS'`
+    同时将 `export DSY_OS_Release=${DSY_OS_Release}` 改为 `export DSY_OS_Release=CentOS`
 
 以上两步操作我已经写成了一个python脚本，可以直接使用，详见 `step-2-installation` 目录中的 `modify_installation_file.py` ，运行这个脚本，输入安装包所在的目录，即可完成以上两步操作。
 
@@ -273,7 +286,7 @@ docker build -t abq2021-tmp1 .
 chmod -R 777 DS.SIMULIA.Suite.2021.Linux64
 ```
 
-接下来就可以在容器中安装Abaqus了。创建一个刚制作的abq2021-tmp1镜像的容器，并把Abaqus安装包挂载到容器中。切换到 `DS.SIMULIA.Suite.2021.Linux64` 所位于的目录，使用以下命令：
+接下来就可以在容器中**手动安装Abaqus**了。创建一个刚制作的abq2021-tmp1镜像的容器，并把Abaqus安装包挂载到容器中。切换到 `DS.SIMULIA.Suite.2021.Linux64` 所位于的目录，使用以下命令：
 
 ```bash
 docker run -d --mount type=bind,source=/absolute/path/to/DS.SIMULIA.Suite.2021.Linux64,target=/root/DS.SIMULIA.Suite.2021.Linux64 --name abq2021-tmp1-1 abq2021-tmp1
@@ -415,7 +428,7 @@ docker commit abq2021-tmp1-1 abq2021-tmp2
 
 ### 3. 安装Abaqus许可证服务
 
-在步骤2中，我们选择了"Skip licensing configuration"，现在我们需要手动安装Abaqus许可证服务，并完成破解。
+在步骤2中，我们选择了"Skip licensing configuration"，现在我们需要手动安装Abaqus许可证服务，并修改Abaqus许可证配置文件。
 
 在宿主机中，将Abaqus安装包中Crack文件夹下的SolidSQUAD_License_Servers拷贝到step-3-license目录中。**注意**，是将SolidSQUAD_License_Servers文件夹拷贝到step-3-license目录中，而不是拷贝文件夹中的内容。
 
@@ -438,7 +451,16 @@ step-3-license
 chmod -R 777 /path/to/SolidSQUAD_License_Servers
 ```
 
-接下来，编写Dockerfile，以abq2021-tmp2为基础镜像，安装许可证服务。Dockerfile详见 `abq2021/step-3-license` 目录。Dockerfile中的操作如下。
+接下来的步骤可以通过Dockerfile自动化完成，我已经编写好了，详见 `abq2021/step-3-license` 目录。使用以下命令创建一个名为abq2021-tmp3的临时镜像：
+
+```bash
+cd /path/to/abq2021/step-3-license
+docker build -t abq2021-tmp3 .
+```
+
+**以下是对Dockerfile中操作的详细解释：**
+
+以abq2021-tmp2为基础镜像，安装许可证服务。
 
 首先，拷贝宿主机的SolidSQUAD_License_Servers到容器中的 `/usr` 目录下，并对文件 `SolidSQUAD_License_Servers/install_or_update.sh` 做如下修改，将
 
@@ -490,13 +512,6 @@ abaquslm_license_file="27800@localhost"
 
 ```bash
 systemctl start flexlmsrvssq
-```
-
-以上就是对Dockerfile中的操作的详细解释。用该Dockerfile创建名为abq2021-tmp3的临时Docker镜像：
-
-```bash
-cd /path/to/abq2021/step-3-license
-docker build -t abq2021-tmp3 .
 ```
 
 ### 4. Squash镜像
