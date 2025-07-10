@@ -504,7 +504,7 @@ license_server_type=FLEXNET
 abaquslm_license_file="27800@localhost"
 ```
 
-即完成破解。
+注意，27800是许可证服务的端口号，端口号取决于具体的许可证文件。至此完成许可证的配置，即破解完成。
 
 最后，需要将 `/var/DassaultSystemes/SIMULIA/Commands` 添加到环境变量PATH中，以便直接调用abaqus命令。
 
