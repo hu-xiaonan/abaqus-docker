@@ -4,8 +4,6 @@ FROM ubuntu:20.04
 #
 # https://github.com/gdraheim/docker-systemctl-replacement/tree/master
 #
-# instead of the official approach (https://hub.docker.com/_/centos).
-#
 # Overwrite "/usr/bin/systemctl" with local "systemctl.py" script.
 COPY systemctl.py /usr/bin/systemctl
 RUN chmod +x /usr/bin/systemctl
