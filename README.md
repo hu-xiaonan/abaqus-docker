@@ -4,9 +4,9 @@
   <img width="300" src="./resources/readme/logo.png">
 </p>
 
-本文分享了我制作的Abaqus 2021的Docker镜像，可以在任何装有Docker的Linux系统上运行（包括WSL），无需复杂的安装过程，开箱即用。[下载链接](#镜像下载)和[使用方法](#使用方法)详见后文。
+本文分享了我制作的Abaqus 2021等Docker镜像，可以在任何装有Docker的Linux系统上运行（包括WSL），无需复杂的安装过程，开箱即用。[镜像获取](#镜像获取)和[使用方法](#使用方法)详见后文。
 
-For English readers, I am sorry that there is no English version of this README because this repository is primarily targeted at Chinese users and I do not have time to translate it into English. FYI, there are other repositories that provide similar solutions in English, such as [willfurnass/abaqus-2017-centos-7-singularity](https://https://github.com/willfurnass/abaqus-2017-centos-7-singularity), [ksHamburg/ABQ2021_on_ubuntu20.04](https://github.com/ksHamburg/ABQ2021_on_ubuntu20.04), and [danielabler/dockerfiles](https://github.com/danielabler/dockerfiles/tree/master/abaqus).
+For English readers, I am sorry that there is no English version of this README because this repository is primarily targeted at Chinese users and I do not have time to translate it into English. FYI, there are other repositories that provide similar solutions in English, such as [willfurnass/abaqus-2017-centos-7-singularity](https://github.com/willfurnass/abaqus-2017-centos-7-singularity), [ksHamburg/ABQ2021_on_ubuntu20.04](https://github.com/ksHamburg/ABQ2021_on_ubuntu20.04), and [danielabler/dockerfiles](https://github.com/danielabler/dockerfiles/tree/master/abaqus).
 
 ## 声明
 
@@ -34,35 +34,51 @@ Abaqus官方的Linux安装程序会检查系统的发行版信息，限制其只
 
 使用Docker的另一个好处是快速部署。只要将Abaqus制作成Docker镜像，就可以将Abaqus部署到任何装有Docker的系统上运行，无需再次安装，真正实现**开箱即用**。Abaqus的Docker镜像的过程比较繁琐，无法通过Dockerfile自动化，需要先在基础容器中手动安装Abaqus，然后再commit成镜像。不过，这个过程只需要做一次，之后就能一劳永逸地使用了。
 
-## 镜像下载
+## 我制作的Abaqus Docker镜像
 
-我制作了Abaqus 2021和Abaqus 2024的Docker镜像，可以在任何装有Docker的系统中运行。
+我制作了Abaqus 2021和Abaqus 2024的Docker镜像，其中包含组件Standard、Explicit、CAE（可以使用GUI）、ODB API、以及Cosimulation Services，支持User Subroutines。不过，因为关联的是gfortran，不是Intel Fortran，我不保证所有User Subroutines都能正常工作。
 
-我制作的镜像包含Standard、Explicit、CAE（可以使用GUI）、ODB API、以及Cosimulation Services，支持User Subroutines。不过，因为关联的是gfortran，不是Intel Fortran，我不保证所有User Subroutines都能正常工作。这个Abaqus镜像的详细制作过程详见后文：[镜像制作过程](#镜像制作过程)。
+上述镜像已在以下Linux发行版上测试过：
+
+- Abaqus 2021：CentOS 7、Ubuntu 20.04、WSL中的Ubuntu 24.04
+- Abaqus 2024：Ubuntu 20.04
+
+（如果有需要，可以联系我制作其他版本的Abaqus的Docker镜像）
+
+Abaqus镜像（以Abaqus 2021为例）的详细制作过程详见后文：[镜像制作过程](#镜像制作过程)。
 
 我应该不是国内第一个做Abaqus Docker镜像的人，Dockerhub上早就有了[其他人做的](https://hub.docker.com/search?q=abaqus)，但我这个应该是功能最全的，而且这份README也是目前最详细的。
+
+## 镜像获取
+
+这里提供两种镜像获取方式：一是直接拉取镜像，二是下载镜像打包文件再导入。
+
+### 方法一：直接拉取镜像
+
+直接从我在阿里云的镜像仓库拉取镜像，速度快且方便。
+
+| 镜像内容 | 仓库地址 |
+| --- | --- |
+| Abaqus 2021 | `crpi-t74h57k37lagn9gw.cn-hangzhou.personal.cr.aliyuncs.com/huxiaonan/abq2021` |
+| Abaqus 2024 | `crpi-t74h57k37lagn9gw.cn-hangzhou.personal.cr.aliyuncs.com/huxiaonan/abq2024` |
+
+以Abaqus 2021为例，使用以下命令拉取镜像，并重命名为更短的名字，以便后续使用：
+
+```bash
+docker pull crpi-t74h57k37lagn9gw.cn-hangzhou.personal.cr.aliyuncs.com/huxiaonan/abq2021
+docker tag crpi-t74h57k37lagn9gw.cn-hangzhou.personal.cr.aliyuncs.com/huxiaonan/abq2021 abq2021
+```
+
+### 方法二：下载镜像打包文件再导入
+
+如果不方便直接拉取镜像，可以先下载镜像打包文件，再离线导入。
 
 | 镜像内容 | 文件名 | 大小 | 链接 | MD5 |
 | --- | --- | --- | --- | --- |
 | Abaqus 2021 | abq2021.tar.xz | 1.77 GiB | [清华大学云盘](https://cloud.tsinghua.edu.cn/f/64d14b75ef5246238f6e/?dl=1) | 4c599c6e16ba46c81a915d598349582c |
 | Abaqus 2024 | abq2024.tar.xz | 3.38 GiB | [清华大学云盘](https://cloud.tsinghua.edu.cn/f/4088d4747d714f768803/?dl=1) | 8586471644d26d5a5aa2ff3a1ae3c5f4 |
 
-（如果有需要，可以联系我制作其他版本的Abaqus的Docker镜像）
-
-以上镜像已在以下Linux发行版上测试过：
-
-- Abaqus 2021：CentOS 7、Ubuntu 20.04、WSL中的Ubuntu 24.04
-- Abaqus 2024：Ubuntu 20.04
-
-我没有把镜像上传到Dockerhub或Github Container Registry，主要有两点原因。一是国内访问这些网站受到限制，可能不方便拉取这么大的镜像。二是因为版权问题，毕竟是破解版软件，在国内传播就好，就不往外网传了。
-
-## 使用方法
-
-下文以Abaqus 2021镜像为例介绍使用方法。Abaqus 2024的使用方法类似，只需将镜像名和容器名分别改为abq2024和abq2024app即可。
-
-### 导入镜像
-
-下载abq2021.tar.xz到本地，使用xz解压缩，得到镜像的打包文件abq2021.tar：
+以Abaqus 2021为例：下载abq2021.tar.xz到本地，使用xz解压缩，得到镜像的打包文件abq2021.tar：
 
 ```bash
 xz -dv abq2021.tar.xz
@@ -74,9 +90,13 @@ xz -dv abq2021.tar.xz
 docker load -i abq2021.tar
 ```
 
-导入镜像要几分钟。导入完成后，可以使用 `docker images` 命令查看镜像，或者使用VSCode的Docker插件查看镜像。
+导入镜像要几分钟。导入完成后，可以使用 `docker images` 命令查看镜像，或者使用VSCode的相关插件查看镜像。
 
 <img width="800" src="./resources/readme/docker_load_image.gif">
+
+## 使用方法
+
+以Abaqus 2021镜像为例介绍使用方法。Abaqus 2024的使用方法类似，只需将镜像名和容器名分别改为abq2024和abq2024app即可。
 
 ### 创建容器应用（不使用CAE图形界面）
 
