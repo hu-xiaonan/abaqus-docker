@@ -36,12 +36,13 @@ Abaqus官方的Linux安装程序会检查系统的发行版信息，限制其只
 
 ## 我制作的Abaqus Docker镜像
 
-我制作了Abaqus 2021和Abaqus 2024的Docker镜像，其中包含组件Standard、Explicit、CAE（可以使用GUI）、ODB API、以及Cosimulation Services，支持User Subroutines。不过，因为关联的是gfortran，不是Intel Fortran，我不保证所有User Subroutines都能正常工作。
+我制作了Abaqus 2021、2024和2025的Docker镜像，其中包含组件Standard、Explicit、CAE（可以使用GUI）、ODB API、以及Cosimulation Services，支持User Subroutines。不过，因为关联的是gfortran，不是Intel Fortran，我不保证所有User Subroutines都能正常工作。
 
 上述镜像已在以下Linux发行版上测试过：
 
 - Abaqus 2021：CentOS 7、Ubuntu 20.04、WSL中的Ubuntu 24.04
-- Abaqus 2024：Ubuntu 20.04
+- Abaqus 2024：Ubuntu 20.04、Ubuntu 24.04
+- Abaqus 2025：Ubuntu 20.04、Ubuntu 24.04
 
 （如果有需要，可以联系我制作其他版本的Abaqus的Docker镜像）
 
@@ -61,6 +62,7 @@ Abaqus镜像（以Abaqus 2021为例）的详细制作过程详见后文：[镜�
 | --- | --- |
 | Abaqus 2021 | `crpi-t74h57k37lagn9gw.cn-hangzhou.personal.cr.aliyuncs.com/huxiaonan/abq2021` |
 | Abaqus 2024 | `crpi-t74h57k37lagn9gw.cn-hangzhou.personal.cr.aliyuncs.com/huxiaonan/abq2024` |
+| Abaqus 2025 | `crpi-t74h57k37lagn9gw.cn-hangzhou.personal.cr.aliyuncs.com/huxiaonan/abq2025` |
 
 以Abaqus 2021为例，使用以下命令拉取镜像，并重命名为更短的名字，以便后续使用：
 
@@ -77,6 +79,7 @@ docker tag crpi-t74h57k37lagn9gw.cn-hangzhou.personal.cr.aliyuncs.com/huxiaonan/
 | --- | --- | --- | --- | --- |
 | Abaqus 2021 | abq2021.tar.xz | 1.77 GiB | [清华大学云盘](https://cloud.tsinghua.edu.cn/f/64d14b75ef5246238f6e/?dl=1) | 4c599c6e16ba46c81a915d598349582c |
 | Abaqus 2024 | abq2024.tar.xz | 3.38 GiB | [清华大学云盘](https://cloud.tsinghua.edu.cn/f/4088d4747d714f768803/?dl=1) | 8586471644d26d5a5aa2ff3a1ae3c5f4 |
+| Abaqus 2025 | abq2025.tar.xz | 4.12 GiB | [清华大学云盘](https://cloud.tsinghua.edu.cn/f/791052506b92422499a3/?dl=1) | 4d546dde064a7abadfa56f3f43f35525 |
 
 以Abaqus 2021为例：下载abq2021.tar.xz到本地，使用xz解压缩，得到镜像的打包文件abq2021.tar：
 
@@ -96,7 +99,7 @@ docker load -i abq2021.tar
 
 ## 使用方法
 
-以Abaqus 2021镜像为例介绍使用方法。Abaqus 2024的使用方法类似，只需将镜像名和容器名分别改为abq2024和abq2024app即可。
+以Abaqus 2021镜像为例介绍使用方法。其他版本的使用方法类似，如对于Abaqus 2024，只需将镜像名和容器名分别改为abq2024、abq2024app即可。
 
 ### 创建容器应用（不使用CAE图形界面）
 
@@ -226,13 +229,17 @@ abq2021 cae -mesa
 
 ### 其他注意事项
 
-经过测试，如果创建容器时设置 `--net=host` ，MPI将无法正常工作，从而导致Abaqus/Explicit无法在mp_mode=mpi模式下多核并行。MPI与容器的兼容性问题非常复杂（[参考文档](https://permedcoe.eu/wp-content/uploads/2021/10/mpi_in_containers.pdf)），这里不做讨论。
+经过测试，如果创建容器时设置 `--net=host` ，MPI将无法正常工作，从而导致Abaqus无法在mp_mode=mpi模式下多核并行。
+
+如果在mp_mode=mpi模式下进行多核并行时出现类似“KILLED BY SIGNAL: 7 (Bus error)”的错误，这可能是由于容器配置导致MPI通信失败。可以尝试在创建容器时添加 `--shm-size=1g` 参数（默认是 64m）以增大共享内存，或创建容器时添加 `--ipc=host` 参数以使用宿主机的IPC命名空间。
+
+MPI与容器的兼容性问题比较复杂（[参考文档](https://permedcoe.eu/wp-content/uploads/2021/10/mpi_in_containers.pdf)），这里不做过多讨论。
 
 ## 镜像制作过程
 
 这部分是我制作Abaqus 2021的Docker镜像的过程，仅供参考。
 
-Abaqus 2024镜像的制作过程详见[abq2024目录](./abq2024/README.md)。
+其他Abaqus版本镜像的制作过程详见对应目录下的README文件。
 
 ### 前置工作
 
