@@ -36,13 +36,9 @@ Abaqus官方的Linux安装程序会检查系统的发行版信息，限制其只
 
 ## 我制作的Abaqus Docker镜像
 
-我制作了Abaqus 2021、2024和2025的Docker镜像，其中包含组件Standard、Explicit、CAE（可以使用GUI）、ODB API、以及Cosimulation Services，支持User Subroutines。不过，因为关联的是gfortran，不是Intel Fortran，我不保证所有User Subroutines都能正常工作。
+我制作了Abaqus 2021、2022、2024和2025的Docker镜像，其中包含组件Standard、Explicit、CAE（可以使用GUI）、ODB API、以及Cosimulation Services，支持User Subroutines。不过，因为关联的是gfortran，不是Intel Fortran，我不保证所有User Subroutines都能正常工作。
 
-上述镜像已在以下Linux发行版上测试过：
-
-- Abaqus 2021：CentOS 7、Ubuntu 20.04、WSL中的Ubuntu 24.04
-- Abaqus 2024：Ubuntu 20.04、Ubuntu 24.04
-- Abaqus 2025：Ubuntu 20.04、Ubuntu 24.04
+上述镜像已在 CentOS 7、Ubuntu 20.04/22.04/24.04（含WSL）上测试通过。
 
 （如果有需要，可以联系我制作其他版本的Abaqus的Docker镜像）
 
@@ -61,6 +57,7 @@ Abaqus镜像（以Abaqus 2021为例）的详细制作过程详见后文：[镜�
 | 镜像内容 | 仓库地址 |
 | --- | --- |
 | Abaqus 2021 | `crpi-t74h57k37lagn9gw.cn-hangzhou.personal.cr.aliyuncs.com/huxiaonan/abq2021` |
+| Abaqus 2022 | `crpi-t74h57k37lagn9gw.cn-hangzhou.personal.cr.aliyuncs.com/huxiaonan/abq2022` |
 | Abaqus 2024 | `crpi-t74h57k37lagn9gw.cn-hangzhou.personal.cr.aliyuncs.com/huxiaonan/abq2024` |
 | Abaqus 2025 | `crpi-t74h57k37lagn9gw.cn-hangzhou.personal.cr.aliyuncs.com/huxiaonan/abq2025` |
 
@@ -78,6 +75,7 @@ docker tag crpi-t74h57k37lagn9gw.cn-hangzhou.personal.cr.aliyuncs.com/huxiaonan/
 | 镜像内容 | 文件名 | 大小 | 链接 | MD5 |
 | --- | --- | --- | --- | --- |
 | Abaqus 2021 | abq2021.tar.xz | 1.77 GiB | [清华大学云盘](https://cloud.tsinghua.edu.cn/f/64d14b75ef5246238f6e/?dl=1) | 4c599c6e16ba46c81a915d598349582c |
+| Abaqus 2022 | abq2022.tar.xz | 2.26 GiB | [清华大学云盘](https://cloud.tsinghua.edu.cn/f/baf56787d9bb464db9dd/?dl=1) | 58eb4a44143bc55dde31f03f62c724e1 |
 | Abaqus 2024 | abq2024.tar.xz | 3.38 GiB | [清华大学云盘](https://cloud.tsinghua.edu.cn/f/4088d4747d714f768803/?dl=1) | 8586471644d26d5a5aa2ff3a1ae3c5f4 |
 | Abaqus 2025 | abq2025.tar.xz | 4.12 GiB | [清华大学云盘](https://cloud.tsinghua.edu.cn/f/791052506b92422499a3/?dl=1) | 4d546dde064a7abadfa56f3f43f35525 |
 
