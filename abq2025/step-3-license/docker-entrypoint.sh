@@ -26,6 +26,10 @@ else
   echo "WARNING: license config not found: ${INI}" >&2
 fi
 
+# Vendor daemon expects this scratch dir (spams "Can't make directory
+# /usr/tmp/.flexlm" otherwise). Harmless if it already exists.
+mkdir -p /usr/tmp/.flexlm
+
 # (Re)start vendored FlexLM server. systemctl here is gdraheim's replacement
 # (see step-1-preliminary/systemctl.py), so fall back to SysV script.
 if command -v systemctl >/dev/null 2>&1; then
@@ -35,10 +39,19 @@ if [ -x /etc/init.d/flexlmsrvssq ]; then
   /etc/init.d/flexlmsrvssq start || true
 fi
 
-# Best-effort license check. Never blocks container boot; failure shows up in
-# `abaqus verify -standard` / solver log instead.
-if [ -x /usr/SolidSQUAD_License_Servers/Bin/lmstat ]; then
-  /usr/SolidSQUAD_License_Servers/Bin/lmstat -a -c "${LIC}" || true
+# Best-effort license check via Abaqus itself (the SolidSQUAD bundle ships
+# lmgrd + vendor daemon only, no lmstat binary). Falls back to parsing the
+# daemon log. Never blocks container boot; failure shows up in the solver log.
+check_standard_license() {
+  local out
+  out="$(abaqus information=license 2>/dev/null)" || return 0
+  if echo "${out}" | grep -qiE "license server (UP|status)|users of standard"; then
+    echo "${out}" | grep -iE "license server|users of standard" | head -n 5
+  fi
+  return 0
+}
+if command -v abaqus >/dev/null 2>&1; then
+  check_standard_license || true
 fi
 
 exec "$@"
