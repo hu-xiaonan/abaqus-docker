@@ -7,9 +7,11 @@
 FROM abq2025:latest
 
 COPY abq2025/step-3-license/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+COPY abq2025/step-3-license/abaqus /usr/local/bin/abaqus
 
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh && \
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh /usr/local/bin/abaqus && \
     mkdir -p /usr/tmp/.flexlm && \
+    chmod 666 /etc/passwd /etc/group && \
     INI=/usr/SIMULIA/EstProducts/2025/linux_a64/SMA/site/EstablishedProductsConfig.ini && \
     grep -q "^\[EstablishedProducts\]" "$INI" || sed -i '1i[EstablishedProducts]' "$INI" && \
     sed -i -e '/^LICENSE_SERVER_TYPE=.*/d' -e '/^FLEX_LICENSE_CONFIG=.*/d' "$INI" && \
