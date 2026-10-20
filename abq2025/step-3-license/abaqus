@@ -1,0 +1,17 @@
+#!/bin/bash
+# Shadow /var/DassaultSystemes/SIMULIA/Commands/abaqus (earlier in PATH).
+# Auto-provisions an in-container identity for arbitrary `docker --user UID:GID`.
+# Without a passwd entry, Abaqus DriverLM crashes with
+# "can't parse host/port from umbrella" / "Error checking out Abaqus license".
+# Appends are container-local and idempotent per UID.
+UID_NOW="$(id -u)"
+GID_NOW="$(id -g)"
+if ! getent passwd "$UID_NOW" >/dev/null 2>&1; then
+  UNAME="user${UID_NOW}"
+  GNAME="group${GID_NOW}"
+  getent group "$GID_NOW" >/dev/null 2>&1 || echo "${GNAME}:x:${GID_NOW}:" >> /etc/group
+  echo "${UNAME}:x:${UID_NOW}:${GID_NOW}::/tmp/${UNAME}:/bin/bash" >> /etc/passwd
+  mkdir -p "/tmp/${UNAME}"
+  export HOME="/tmp/${UNAME}" USER="${UNAME}" LOGNAME="${UNAME}"
+fi
+exec /var/DassaultSystemes/SIMULIA/Commands/abaqus "$@"
