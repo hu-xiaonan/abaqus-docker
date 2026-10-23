@@ -1,0 +1,25 @@
+# Zero-config abq2025: license fully baked in, nothing to configure.
+# Build on a machine with the base image:
+#   docker build -f Dockerfile.fixed -t abq2025-fixed .
+# Run with no license steps at all:
+#   docker run -d --name abq2025app abq2025-fixed
+#   docker exec --workdir /tmp abq2025app abaqus verify -std
+FROM abq2025:latest
+
+COPY abq2025/step-3-license/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+COPY abq2025/step-3-license/abaqus /usr/local/bin/abaqus
+
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh /usr/local/bin/abaqus && \
+    mkdir -p /usr/tmp/.flexlm && \
+    chmod 666 /etc/passwd /etc/group && \
+    INI=/usr/SIMULIA/EstProducts/2025/linux_a64/SMA/site/EstablishedProductsConfig.ini && \
+    grep -q "^\[EstablishedProducts\]" "$INI" || sed -i '1i[EstablishedProducts]' "$INI" && \
+    sed -i -e '/^LICENSE_SERVER_TYPE=.*/d' -e '/^FLEX_LICENSE_CONFIG=.*/d' "$INI" && \
+    echo "LICENSE_SERVER_TYPE=flex" >> "$INI" && \
+    echo "FLEX_LICENSE_CONFIG=27800@localhost" >> "$INI" && \
+    cat "$INI"
+
+ENV LANG=C.UTF-8
+
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
+CMD ["sleep", "infinity"]
