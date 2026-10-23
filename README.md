@@ -221,7 +221,7 @@ docker run -d --mount type=bind,source=/home,target=/home --volume=/tmp/.X11-uni
 abq2021 cae -mesa
 ```
 
-**注意**：一定要加上 `-mesa` 参数，否则由于缺少依赖库，图形界面无法正常启动。该参数的作用是关闭硬件加速，改用软件渲染。
+**注意**：一定要加上 `-mesa` 参数，否则由于缺少依赖库，图形界面无法正常启动。该参数的作用是关闭硬件加速，改用软件渲染。如果不想用 `-mesa`（即需要硬件加速），可以在容器里额外安装 OpenGL 依赖并配置好 GPU，但具体方案因硬件而异，此处不展开。有需要可以参考 [Issue #11 中 zcc2xj 的回复](https://github.com/hu-xiaonan/abaqus-docker/issues/11#issuecomment-6281042823)。
 
 <img width="800" src="./resources/readme/docker_exec_gui.gif">
 
