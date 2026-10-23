@@ -221,17 +221,19 @@ docker run -d --mount type=bind,source=/home,target=/home --volume=/tmp/.X11-uni
 abq2021 cae -mesa
 ```
 
-**注意**：一定要加上 `-mesa` 参数，否则由于缺少依赖库，图形界面无法正常启动。该参数的作用是关闭硬件加速，改用软件渲染。
+**注意**：一定要加上 `-mesa` 参数，否则由于缺少依赖库，图形界面无法正常启动。该参数的作用是关闭硬件加速，改用软件渲染。如果不想用 `-mesa`（即需要硬件加速），可以在容器里额外安装 OpenGL 依赖并配置好 GPU，但具体方案因硬件而异，此处不展开。有需要可以参考 [Issue #11 中 zcc2xj 的回复](https://github.com/hu-xiaonan/abaqus-docker/issues/11#issuecomment-6281042823)。
 
 <img width="800" src="./resources/readme/docker_exec_gui.gif">
 
-### 其他注意事项
+### MPI多核并行配置
+
+Abaqus默认使用MPI进行多核并行（mp_mode=mpi），一般情况下不需要任何额外参数就可以工作。不过，MPI与容器的兼容性问题比较复杂（[参考文档](https://permedcoe.eu/wp-content/uploads/2021/10/mpi_in_containers.pdf)），有一些注意事项。
 
 经过测试，如果创建容器时设置 `--net=host` ，MPI将无法正常工作，从而导致Abaqus无法在mp_mode=mpi模式下多核并行。
 
 如果在mp_mode=mpi模式下进行多核并行时出现类似“KILLED BY SIGNAL: 7 (Bus error)”的错误，这可能是由于容器配置导致MPI通信失败。可以尝试在创建容器时添加 `--shm-size=1g` 参数（默认是 64m）以增大共享内存，或创建容器时添加 `--ipc=host` 参数以使用宿主机的IPC命名空间。
 
-MPI与容器的兼容性问题比较复杂（[参考文档](https://permedcoe.eu/wp-content/uploads/2021/10/mpi_in_containers.pdf)），这里不做过多讨论。
+如果需要把容器绑定到特定CPU范围，需要设置 `I_MPI_PIN` 和 `I_MPI_PIN_PROCESSOR_LIST` 环境变量，额外告知MPI能用哪些CPU核心，否则MPI初始化会失败，这是MPI与Docker的兼容性问题。完整分析、配置方法和脚本可参考 [Issue #11](https://github.com/hu-xiaonan/abaqus-docker/issues/11)。感谢 [@zcc2xj](https://github.com/zcc2xj)。
 
 ## 镜像制作过程
 
