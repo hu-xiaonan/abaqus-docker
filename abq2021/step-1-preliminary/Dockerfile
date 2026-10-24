@@ -15,6 +15,7 @@ RUN chmod +x /usr/bin/systemctl
 # Switch to the Aliyun repository since the default repository can be
 # inaccessible in China.
 RUN curl -o /etc/yum.repos.d/CentOS-Base.repo https://mirrors.aliyun.com/repo/Centos-7.repo && \
-    yum install -y sudo dos2unix perl libX11 libjpeg libXext gcc-gfortran
+    yum install -y sudo dos2unix perl libX11 libjpeg libXext gcc-gfortran && \
+    yum clean all && rm -rf /var/cache/yum
 
 CMD ["sleep", "infinity"]
