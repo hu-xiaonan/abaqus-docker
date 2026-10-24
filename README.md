@@ -48,10 +48,6 @@ Abaqus镜像（以Abaqus 2021为例）的详细制作过程详见后文：[镜�
 
 ## 镜像获取
 
-这里提供两种镜像获取方式：一是直接拉取镜像，二是下载镜像打包文件再导入。
-
-### 方法一：直接拉取镜像
-
 直接从我在阿里云的镜像仓库拉取镜像，速度快且方便。
 
 | 镜像内容 | 仓库地址 |
@@ -67,33 +63,6 @@ Abaqus镜像（以Abaqus 2021为例）的详细制作过程详见后文：[镜�
 docker pull crpi-t74h57k37lagn9gw.cn-hangzhou.personal.cr.aliyuncs.com/huxiaonan/abq2021
 docker tag crpi-t74h57k37lagn9gw.cn-hangzhou.personal.cr.aliyuncs.com/huxiaonan/abq2021 abq2021
 ```
-
-### 方法二：下载镜像打包文件再导入
-
-如果不方便直接拉取镜像，可以先下载镜像打包文件，再离线导入。
-
-| 镜像内容 | 文件名 | 大小 | 链接 | MD5 |
-| --- | --- | --- | --- | --- |
-| Abaqus 2021 | abq2021.tar.xz | 1.77 GiB | [清华大学云盘](https://cloud.tsinghua.edu.cn/f/64d14b75ef5246238f6e/?dl=1) | 4c599c6e16ba46c81a915d598349582c |
-| Abaqus 2022 | abq2022.tar.xz | 2.26 GiB | [清华大学云盘](https://cloud.tsinghua.edu.cn/f/baf56787d9bb464db9dd/?dl=1) | 58eb4a44143bc55dde31f03f62c724e1 |
-| Abaqus 2024 | abq2024.tar.xz | 3.38 GiB | [清华大学云盘](https://cloud.tsinghua.edu.cn/f/4088d4747d714f768803/?dl=1) | 8586471644d26d5a5aa2ff3a1ae3c5f4 |
-| Abaqus 2025 | abq2025.tar.xz | 4.12 GiB | [清华大学云盘](https://cloud.tsinghua.edu.cn/f/791052506b92422499a3/?dl=1) | 4d546dde064a7abadfa56f3f43f35525 |
-
-以Abaqus 2021为例：下载abq2021.tar.xz到本地，使用xz解压缩，得到镜像的打包文件abq2021.tar：
-
-```bash
-xz -dv abq2021.tar.xz
-```
-
-使用以下命令导入镜像：
-
-```bash
-docker load -i abq2021.tar
-```
-
-导入镜像要几分钟。导入完成后，可以使用 `docker images` 命令查看镜像，或者使用VSCode的相关插件查看镜像。
-
-<img width="800" src="./resources/readme/docker_load_image.gif">
 
 ## 使用方法
 
