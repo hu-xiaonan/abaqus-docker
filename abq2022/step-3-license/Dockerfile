@@ -24,4 +24,13 @@ RUN if [ ! -e /var/DassaultSystemes/SIMULIA/Commands/abaqus ]; then \
     fi
 ENV PATH="$PATH:/var/DassaultSystemes/SIMULIA/Commands"
 
+# Fix encoding errors (e.g. "TypeError: unicode() argument 2 must be string,
+# not None") when loading plugins in Abaqus CAE. CentOS 7 image ships with no
+# LANG set and Python 2 leaves locale otherwise unset, causing Abaqus's plugin
+# system to crash without a valid UTF-8 encoding. en_US.utf8 is the only UTF-8
+# locale available in CentOS 7 and is present in Abaqus's acceptable alias list
+# (see /usr/SIMULIA/EstProducts/2022/linux_a64/SMA/Configuration/locale.txt
+# [Alias] section).
+ENV LANG=en_US.utf8
+
 CMD systemctl start flexlmsrvssq && sleep infinity
