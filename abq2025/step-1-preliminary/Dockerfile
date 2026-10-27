@@ -10,7 +10,7 @@ RUN chmod +x /usr/bin/systemctl
 
 # Dependencies:
 # - openssh-client: Required for MPI.
-# - libx11-6, libjpeg62, libxext6, libgl1, libglu1-mesa: Required for Abaqus CAE.
+# - libx11-6, libjpeg62, libxext6: Required for Abaqus CAE.
 # - python2: Required for systemctl.py.
 # - lsb-core: Required for the SolidSQUAD License Server.
 #
@@ -18,8 +18,11 @@ RUN chmod +x /usr/bin/systemctl
 # tzdata may prompt for user input during installation.
 # Setting DEBIAN_FRONTEND=noninteractive avoids this.
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends gfortran openssh-client libx11-6 libjpeg62 libxext6 libgl1 libglu1-mesa python2 && \
+    # Minimal core system packages for Abaqus installation and runtime.
+    apt-get install -y --no-install-recommends gfortran openssh-client libx11-6 libjpeg62 libxext6 python2 && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y lsb-core && \
+    # Additional libraries to enable CAE to run without `-mesa` flag.
+    apt-get install -y --no-install-recommends libgl1 libglu1-mesa libglx0 libglx-mesa0 libegl1 && \
     rm -rf /var/lib/apt/lists/*
 
 CMD ["sleep", "infinity"]
