@@ -18,8 +18,11 @@ RUN chmod +x /usr/bin/systemctl
 # tzdata may prompt for user input during installation.
 # Setting DEBIAN_FRONTEND=noninteractive avoids this.
 RUN apt-get update && \
+    # Minimal core system packages for Abaqus installation and runtime.
     apt-get install -y --no-install-recommends gfortran openssh-client libx11-6 libjpeg62 libxext6 python2 && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y lsb-core && \
+    # Additional libraries to enable CAE to run without `-mesa` flag.
+    apt-get install -y --no-install-recommends libgl1 libglu1-mesa libglx0 libglx-mesa0 libegl1 && \
     rm -rf /var/lib/apt/lists/*
 
 CMD ["sleep", "infinity"]

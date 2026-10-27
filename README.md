@@ -190,7 +190,9 @@ docker run -d --mount type=bind,source=/home,target=/home --volume=/tmp/.X11-uni
 abq2021 cae -mesa
 ```
 
-**注意**：一定要加上 `-mesa` 参数，否则由于缺少依赖库，图形界面无法正常启动。该参数的作用是关闭硬件加速，改用软件渲染。如果不想用 `-mesa`（即需要硬件加速），可以在容器里额外安装 OpenGL 依赖并配置好 GPU，但具体方案因硬件而异，此处不展开。有需要可以参考 [Issue #11 中 zcc2xj 的回复](https://github.com/hu-xiaonan/abaqus-docker/issues/11#issuecomment-6281042823)。
+**注意**：
+1. 建议带上 `-mesa` 参数，强制使用软件渲染，这样最稳。
+2. 镜像自带OpenGL依赖库，一般来说不加 `-mesa` 也能启动CAE，在宿主机GPU可用的情况下会自动启用硬件加速。但图形栈依赖宿主机环境，我不保证在所有平台上都正常。
 
 <img width="800" src="./resources/readme/docker_exec_gui.gif">
 
@@ -248,6 +250,8 @@ yum install sudo dos2unix perl libX11 libjpeg libXext
 ```
 
 其中，sudo、dos2unix和perl对于我所使用的安装包来说是必需的，但可能并非所有安装包都依赖这三个。libX11、libjpeg和libXext则是Abaqus CAE运行所必需的依赖库。
+
+除了这些必要的库之外，如果要不加 `-mesa` 运行CAE，还需要一些OpenGL相关库。
 
 此外，如果需要User Subroutine，那么还需要安装Fortran编译器，这里使用gfortran。
 
