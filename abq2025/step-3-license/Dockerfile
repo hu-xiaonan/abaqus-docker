@@ -21,8 +21,15 @@ ENV PATH="$PATH:/var/DassaultSystemes/SIMULIA/Commands"
 # Tell Abaqus to use gfortran as the Fortran compiler.
 ENV ABQ_USUB_GFORTRAN=1
 
-# Abaqus CAE startup reads site env files through Python and expects a UTF-8 locale.
+# Fix "decode() argument 'encoding' must be str, not None" in Edit Keywords and
+# other Abaqus features. C.UTF-8 is the only UTF-8 locale available in Ubuntu
+# 20.04 image, but it is not present in Abaqus's acceptable alias list (see
+# /usr/SIMULIA/EstProducts/2025/linux_a64/SMA/Configuration/locale.txt [Alias]
+# section). Abaqus would reset locale back to 'C' during startup otherwise.
+# LANG provides the UTF-8 value, ABAQUS_KEEP_LOCALE=1 prevents Abaqus from
+# resetting it to 'C'.
 ENV LANG=C.UTF-8
+ENV ABAQUS_KEEP_LOCALE=1
 
 # Entrypoint: start the FlexLM daemon then exec user's command.
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh

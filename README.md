@@ -510,6 +510,29 @@ abaquslm_license_file="27800@localhost"
 systemctl start flexlmsrvssq
 ```
 
+#### 补充：locale 问题修复
+
+Docker 精简环境中启动 Abaqus CAE 还会遇到 locale 相关的报错。不同版本报的错略有不同：2021/2022（Python 2）表现为 CAE 启动时插件加载报错 `TypeError: unicode() argument 2 must be string, not None`；2024（Python 3）则是右键 Model → Edit Keywords 报 `TypeError: decode() argument 'encoding' must be str, not None`；2025 更是直接启动失败。
+
+排查这个问题时，反编译了 `/usr/SIMULIA/EstProducts/2021/linux_a64/code/python2.7/lib/uti.pyc`，看到了 locale 初始化逻辑。核心坑点在于：Abaqus 启动时会从 `LANG` 获取语言编码，但 Abaqus 还会检查，如果值不在 `/usr/SIMULIA/EstProducts/2021/linux_a64/SMA/Configuration/locale.txt` 的 alias 列表里，Abaqus 就会把 locale 重置为 `'C'`，之后任何涉及 UTF-8 编码的代码都会出错。
+
+这个问题无论是对于 CentOS 7 还是 Ubuntu 20 基础镜像都存在：
+- CentOS 7 默认 `LANG` 是空的，Abaqus 读不到。
+- Ubuntu 20 镜像只有 `C.UTF-8` 一个 UTF-8 locale，但这个值不在 `locale.txt` 的 alias 列表里，Abaqus 会把 locale 重置为 `'C'`。
+
+修复方案：
+
+```dockerfile
+# Abaqus 2021/2022 (CentOS 7)
+ENV LANG=en_US.utf8
+
+# Abaqus 2024/2025 (Ubuntu 20)
+ENV LANG=C.UTF-8
+ENV ABAQUS_KEEP_LOCALE=1
+```
+
+CentOS 7 只设 `LANG=en_US.utf8` 就够了，因为它在 alias 列表里。Ubuntu 20 必须加 `ABAQUS_KEEP_LOCALE=1`，因为 `C.UTF-8` 不在 alias 列表里，这个环境变量能让 Abaqus 跳过重置。
+
 ### 4. Squash镜像
 
 上一步得到的临时Docker镜像已经几乎可以正常使用了，但在Abaqus调用MPI时，例如使用mp_mode=mpi进行多核并行时，会报以下警告：

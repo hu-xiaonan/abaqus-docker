@@ -16,6 +16,15 @@ RUN sed -i 's/INITSYSTEM="`detect_linux_init_system`"/INITSYSTEM="systemd"/g' /u
 # Make "abaqus" command available in the terminal.
 ENV PATH="$PATH:/var/DassaultSystemes/SIMULIA/Commands"
 
+# Fix encoding errors (e.g. "TypeError: unicode() argument 2 must be string,
+# not None") when loading plugins in Abaqus CAE. CentOS 7 image ships with no
+# LANG set and Python 2 leaves locale otherwise unset, causing Abaqus's plugin
+# system to crash without a valid UTF-8 encoding. en_US.utf8 is the only UTF-8
+# locale available in CentOS 7 and is present in Abaqus's acceptable alias list
+# (see /usr/SIMULIA/EstProducts/2021/linux_a64/SMA/Configuration/locale.txt
+# [Alias] section).
+ENV LANG=en_US.utf8
+
 # Entrypoint: start the FlexLM daemon, then exec user's command.
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
