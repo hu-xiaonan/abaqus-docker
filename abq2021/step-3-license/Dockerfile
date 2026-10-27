@@ -16,5 +16,8 @@ RUN sed -i 's/INITSYSTEM="`detect_linux_init_system`"/INITSYSTEM="systemd"/g' /u
 # Make "abaqus" command available in the terminal.
 ENV PATH="$PATH:/var/DassaultSystemes/SIMULIA/Commands"
 
-# Start the license server and keep the container running.
-CMD systemctl start flexlmsrvssq && sleep infinity
+# Entrypoint: start the FlexLM daemon, then exec user's command.
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
+CMD ["sleep", "infinity"]

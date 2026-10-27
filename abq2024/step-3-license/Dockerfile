@@ -21,4 +21,8 @@ ENV PATH="$PATH:/var/DassaultSystemes/SIMULIA/Commands"
 # Tell Abaqus to use gfortran as the Fortran compiler.
 ENV ABQ_USUB_GFORTRAN=1
 
-CMD systemctl start flexlmsrvssq && sleep infinity
+# Entrypoint: start the FlexLM daemon, then exec user's command.
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
+CMD ["sleep", "infinity"]

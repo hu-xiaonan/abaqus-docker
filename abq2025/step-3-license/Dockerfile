@@ -24,4 +24,8 @@ ENV ABQ_USUB_GFORTRAN=1
 # Abaqus CAE startup reads site env files through Python and expects a UTF-8 locale.
 ENV LANG=C.UTF-8
 
-CMD systemctl start flexlmsrvssq && sleep infinity
+# Entrypoint: start the FlexLM daemon then exec user's command.
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
+CMD ["sleep", "infinity"]
