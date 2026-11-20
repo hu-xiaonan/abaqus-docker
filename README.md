@@ -36,7 +36,7 @@ Abaqus官方的Linux安装程序会检查系统的发行版信息，限制其只
 
 ## 我制作的Abaqus Docker镜像
 
-我制作了Abaqus 2021、2022、2024和2025的Docker镜像，其中包含组件Standard、Explicit、CAE（可以使用GUI）、ODB API、以及Cosimulation Services，支持User Subroutines。不过，因为关联的是gfortran，不是Intel Fortran，我不保证所有User Subroutines都能正常工作。
+我制作了Abaqus 2020、2021、2022、2024和2025的Docker镜像，其中包含组件Standard、Explicit、CAE（可以使用GUI）、ODB API、以及Cosimulation Services，支持User Subroutines。不过，因为关联的是gfortran，不是Intel Fortran，我不保证所有User Subroutines都能正常工作。
 
 上述镜像已在 CentOS 7、Ubuntu 20.04/22.04/24.04（含WSL）上测试通过。
 
@@ -52,6 +52,7 @@ Abaqus镜像（以Abaqus 2021为例）的详细制作过程详见后文：[镜�
 
 | 镜像内容 | 仓库地址 |
 | --- | --- |
+| Abaqus 2020 | `crpi-t74h57k37lagn9gw.cn-hangzhou.personal.cr.aliyuncs.com/huxiaonan/abq2020` |
 | Abaqus 2021 | `crpi-t74h57k37lagn9gw.cn-hangzhou.personal.cr.aliyuncs.com/huxiaonan/abq2021` |
 | Abaqus 2022 | `crpi-t74h57k37lagn9gw.cn-hangzhou.personal.cr.aliyuncs.com/huxiaonan/abq2022` |
 | Abaqus 2024 | `crpi-t74h57k37lagn9gw.cn-hangzhou.personal.cr.aliyuncs.com/huxiaonan/abq2024` |
@@ -925,9 +926,9 @@ docker exec -it abq2021-tmp1-1 /bin/bash
     改为
 
     ```python
-    compile_fortran = [fortCmd,
-                       '-c', '-fPIC', '-extend_source',
-                       '-Warray-bounds', '-I%I']
+compile_fortran = [fortCmd,
+                   '-c', '-fPIC', '-extend_source',
+                   '-Warray-bounds', '-I%I']
     ```
 
 - 修改链接选项，将这一串链接选项
@@ -943,10 +944,10 @@ docker exec -it abq2021-tmp1-1 /bin/bash
     改为
 
     ```python
-    link_sl = [fortCmd,
-               '-fPIC', '-pthread', '-shared',
-               '%E', '-Wl,-soname,%U', '-o', '%U', '%F',   '%A', '%L', '%B',
-               '-Wl,-Bdynamic', '-lifport', '-lifcoremt']
+link_sl = [fortCmd,
+           '-fPIC', '-pthread', '-shared',
+           '%E', '-Wl,-soname,%U', '-o', '%U', '%F',   '%A', '%L', '%B',
+           '-Wl,-Bdynamic', '-lifport', '-lifcoremt']
     ```
 
 这样就可以了。可以通过命令 `abaqus verify -user_std` 来验证是否成功关联Fortran编译器。如果提示PASS，说明关联成功。
